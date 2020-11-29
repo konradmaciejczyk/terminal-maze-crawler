@@ -1,12 +1,21 @@
-//Konrad Maciejczyk, 2020
+//Konrad Maciejczyk, 2020"
+//clear && gcc main.c -o binaries/main -lncursesw && ./binaries/main
 #include <stdlib.h>
 #include <ncurses.h>
 #include <menu.h>
+#include <locale.h>
+#include <wchar.h>
+
 void credits();
+void set_layout();
+void update_stats();
+void game();
+WINDOW *create_hud();
 
 void set_game_enviroment(){
    system("printf '\e[8;50;150t'"); //Setting user terminal to 150x50
 
+   setlocale(LC_ALL, "");
    initscr(); //Initialize ncurses screen
 
    if (has_colors() == false){ //Check whether terminal can display colors
@@ -64,7 +73,7 @@ void display_banner(){
    wattroff(banner, COLOR_PAIR(2)); wattroff(banner, A_BOLD);	
 }
 
-void main_menu(){
+void main_menu(){ 
    int row, col; getmaxyx(stdscr, row, col);
 
    int menu_width = 50, menu_height = 10, menu_pos_x = col/2 - 25, menu_pos_y = row - 22; //Creating window for opton menu_win
@@ -112,22 +121,22 @@ void main_menu(){
    switch (highlight)
    {
    case 0:
-      printf("New Game goes here");
+         game();
+         //update_stats(my_win);
       break;
    case 1:
-      printf("Hall of Fame goes here");
+      
       break;
    case 2:
       credits();
+      break;
    case 3:
       quit_game();
-
+      break;
    
    default:
       break;
-   }
-
-    
+   }    
 }
 
 void credits(){
@@ -140,6 +149,33 @@ void credits(){
    display_banner();
    main_menu();
 
+}
+void game(){
+   clear(); refresh();
+   WINDOW *hud;
+   
+   
+   hud = create_hud();
+
+}
+
+WINDOW *create_hud(){
+   WINDOW *hud;
+    
+   hud = newwin(42, 24, 1, 2);
+   wborder(hud, ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ');
+   mvwprintw(hud, 3, 5, "Player: %s", "Konrad");
+   mvwprintw(hud, 12, 5, "health: "); wprintw(hud, "\u2665 \u2665 \u2665");
+   mvwprintw(hud, 15, 5, "time: 15:00");
+   mvwprintw(hud, 18, 5, "score: 10");
+   mvwprintw(hud, 21, 5, "map: 12");
+
+   wrefresh(hud);
+   return hud;
+}
+
+void update_stats(WINDOW *hud){
+   mvwprintw(hud, 3, 4, "time: 15:00");
 }
 
 int main() {
