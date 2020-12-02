@@ -10,7 +10,11 @@ void credits();
 void set_layout();
 void update_stats();
 void game();
+void how_to_play();
+void hall_of_fame();
+
 WINDOW *create_hud();
+WINDOW *create_map();
 
 void set_game_enviroment(){
    system("printf '\e[8;50;150t'"); //Setting user terminal to 150x50
@@ -52,7 +56,7 @@ void display_banner(){
 
    
    int row, col; getmaxyx(stdscr, row, col); //Getting current terminal height, width
-
+   //Centering position of the banner
    int banner_pos_x = col/2 - title_width / 2;
    int banner_pos_y = row/2 - title_height;
    int banner_width = title_width + 3;
@@ -83,12 +87,12 @@ void main_menu(){
 
    keypad(menu_win, true); //Allows to use arrows in order to pick up options from menu
 
-   char MENU_OPTIONS[4][13] = {"New Game", "Hall of Fame", "Credits", "Quit Game"};
+   char MENU_OPTIONS[5][13] = {"New Game", "Hall of Fame", "How to play", "Credits", "Quit Game"};
 
    int highlight = 0, choice;
 
-   while(1){
-      for (int i=0; i<4; i++){
+   while(1){ //main menu 
+      for (int i=0; i<5; i++){
          if(i==highlight){
             wattron(menu_win, A_REVERSE);
          }
@@ -121,29 +125,41 @@ void main_menu(){
    switch (highlight)
    {
    case 0:
-         game();
-         //update_stats(my_win);
+      game();
       break;
    case 1:
-      
+      hall_of_fame();
       break;
    case 2:
-      credits();
+      how_to_play();
       break;
    case 3:
-      quit_game();
+      credits();
       break;
+   case 4:
+      quit_game();
    
    default:
       break;
    }    
 }
 
+void hall_of_fame(){
+   printf("Hall of fame goes here!");
+   quit_game();
+}
+
+void how_to_play(){
+   printf("How to play goes here!");
+   quit_game();
+}
 void credits(){
+   int row, col;
+   getmaxyx(stdscr, row, col); row /= 2; col /= 2;
    clear();
-   mvprintw(22, 71, "Made by:");
-   mvprintw(23, 63, "Konrad Maciejczyk, 2020");
-   mvprintw(27, 61, "github.com/konradmaciejczyk");
+   mvprintw(row - 3, col - 6, "Created by:");
+   mvprintw(row, col - 12, "Konrad Maciejczyk, 2020");
+   mvprintw(row + 3, col - 14, "github.com/konradmaciejczyk");
    getch();
    clear();
    display_banner();
@@ -152,30 +168,87 @@ void credits(){
 }
 void game(){
    clear(); refresh();
-   WINDOW *hud;
+   WINDOW *hud, *map;
    
    
    hud = create_hud();
+   map = create_map();
 
 }
 
 WINDOW *create_hud(){
    WINDOW *hud;
-    
-   hud = newwin(42, 24, 1, 2);
+   init_pair(3, COLOR_YELLOW, COLOR_BLACK);
+   int row, col; getmaxyx(stdscr, row, col);row = row / 2 - 22; col = col / 2 - 60;
+
+   hud = newwin(44, 24, row, col);
    wborder(hud, ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ');
-   mvwprintw(hud, 3, 5, "Player: %s", "Konrad");
-   mvwprintw(hud, 12, 5, "health: "); wprintw(hud, "\u2665 \u2665 \u2665");
-   mvwprintw(hud, 15, 5, "time: 15:00");
-   mvwprintw(hud, 18, 5, "score: 10");
-   mvwprintw(hud, 21, 5, "map: 12");
+
+   mvwprintw(hud, 3, 5, "Player: ");
+   wattron(hud, COLOR_PAIR(3));
+   wprintw(hud, "Legend27");
+   wattroff(hud, COLOR_PAIR(3));
+
+   mvwprintw(hud, 12, 5, "health: ");
+   wattron(hud, COLOR_PAIR(2)); wattron(hud, A_BOLD);
+   wprintw(hud, "\u2665 \u2665 \u2665");
+   wattroff(hud, COLOR_PAIR(2)); wattroff(hud, A_BOLD);
+
+   mvwprintw(hud, 15, 5, "time: ");
+   wattron(hud, COLOR_PAIR(3));
+   wprintw(hud, "10:00");
+   wattroff(hud, COLOR_PAIR(3));
+
+   mvwprintw(hud, 18, 5, "score: ");
+   wattron(hud, COLOR_PAIR(3));
+   wprintw(hud, "0");
+   wattroff(hud, COLOR_PAIR(3));
+
+   mvwprintw(hud, 21, 5, "map: ");
+   wattron(hud, COLOR_PAIR(3));
+   wprintw(hud, "1");
+   wattroff(hud, COLOR_PAIR(3));
 
    wrefresh(hud);
    return hud;
 }
 
-void update_stats(WINDOW *hud){
-   mvwprintw(hud, 3, 4, "time: 15:00");
+WINDOW *create_map(){
+   WINDOW *map;
+
+   int row, col; getmaxyx(stdscr, row, col); row = row / 2 - 23; col = col / 2 - 60;
+   map = newwin(42, 83, row + 2, col + 28);
+
+   int terrain[42][84];
+   //zeroing out map matrix
+   for(int i=1; i<41; i++){
+      for(int j=2; j<82; j++){
+         terrain[i][j] = 0;
+      }
+   }
+   //vertical border lines
+   for(int i=0; i<42; i++){
+      terrain[i][0]  = 1; terrain[i][1]  = 1;
+      terrain[i][81]  = 1; terrain[i][82]  = 1;
+   }
+   //horizontal border lines
+   for(int i=0; i<84; i++){
+      terrain[0][i]  = 1;
+      terrain[41][i]  = 1;
+   }
+
+   //printing out obstacles
+   for(int i=0; i<42; i++){
+      for (int j=0; j<83; j++){
+         if(terrain[i][j] == 1){
+            mvwprintw(map, i, j, "\u2588");
+         }
+      }
+   }
+   
+   wrefresh(map);
+
+   return map;
 }
 
 int main() {
