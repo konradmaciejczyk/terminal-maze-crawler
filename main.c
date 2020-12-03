@@ -6,15 +6,9 @@
 #include <locale.h>
 #include <wchar.h>
 
-void credits();
-void set_layout();
-void update_stats();
-void game();
-void how_to_play();
-void hall_of_fame();
+void credits(); void set_layout(); void update_stats(); void game(); void how_to_play(); void hall_of_fame();
+WINDOW *create_hud(); WINDOW *create_map(); int create_terrain(); void draw_terrain();
 
-WINDOW *create_hud();
-WINDOW *create_map();
 
 void set_game_enviroment(){
    system("printf '\e[8;50;150t'"); //Setting user terminal to 150x50
@@ -111,8 +105,8 @@ void main_menu(){
             break;
          case KEY_DOWN:
             highlight++;
-            if (highlight == 4)
-               highlight = 3;
+            if (highlight == 5)
+               highlight = 4;
             break;         
          default:
             break;
@@ -125,7 +119,16 @@ void main_menu(){
    switch (highlight)
    {
    case 0:
-      game();
+      //Getting player's name
+      wclear(menu_win);
+      int row, col; getmaxyx(menu_win, row, col); col = col / 2 - 8;
+      mvwprintw(menu_win, 0, col, "Enter your name:");
+      wmove(menu_win, 2, col + 4);
+      char nazwa[9];
+      wgetnstr(menu_win, nazwa, 8);   
+      wrefresh(menu_win);
+
+      game(nazwa);
       break;
    case 1:
       hall_of_fame();
@@ -153,6 +156,7 @@ void how_to_play(){
    printf("How to play goes here!");
    quit_game();
 }
+
 void credits(){
    int row, col;
    getmaxyx(stdscr, row, col); row /= 2; col /= 2;
@@ -166,44 +170,46 @@ void credits(){
    main_menu();
 
 }
-void game(){
-   clear(); refresh();
-   WINDOW *hud, *map;
-   
-   
-   hud = create_hud();
-   map = create_map();
 
+void game(char nazwa[9]){
+   clear(); refresh();
+   WINDOW *hud, *map;   
+   
+   hud = create_hud(nazwa);
+   map = create_map();
+   int areas[40][80];
+   create_terrain(areas);
+   draw_terrain(map, areas);
 }
 
-WINDOW *create_hud(){
+WINDOW *create_hud(char nazwa[9]){
    WINDOW *hud;
    init_pair(3, COLOR_YELLOW, COLOR_BLACK);
    int row, col; getmaxyx(stdscr, row, col);row = row / 2 - 22; col = col / 2 - 60;
 
    hud = newwin(44, 24, row, col);
    wborder(hud, ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ');
-
+   //Player name
    mvwprintw(hud, 3, 5, "Player: ");
    wattron(hud, COLOR_PAIR(3));
-   wprintw(hud, "Legend27");
+   wprintw(hud, "%s", nazwa);
    wattroff(hud, COLOR_PAIR(3));
-
+   //Players health
    mvwprintw(hud, 12, 5, "health: ");
    wattron(hud, COLOR_PAIR(2)); wattron(hud, A_BOLD);
    wprintw(hud, "\u2665 \u2665 \u2665");
    wattroff(hud, COLOR_PAIR(2)); wattroff(hud, A_BOLD);
-
+   //Time left
    mvwprintw(hud, 15, 5, "time: ");
    wattron(hud, COLOR_PAIR(3));
    wprintw(hud, "10:00");
    wattroff(hud, COLOR_PAIR(3));
-
+   //Score
    mvwprintw(hud, 18, 5, "score: ");
    wattron(hud, COLOR_PAIR(3));
    wprintw(hud, "0");
    wattroff(hud, COLOR_PAIR(3));
-
+   //Map number
    mvwprintw(hud, 21, 5, "map: ");
    wattron(hud, COLOR_PAIR(3));
    wprintw(hud, "1");
@@ -215,42 +221,49 @@ WINDOW *create_hud(){
 
 WINDOW *create_map(){
    WINDOW *map;
-
+   //calculating place for centering the map 
    int row, col; getmaxyx(stdscr, row, col); row = row / 2 - 23; col = col / 2 - 60;
    map = newwin(42, 83, row + 2, col + 28);
-
-   int terrain[42][84];
-   //zeroing out map matrix
-   for(int i=1; i<41; i++){
-      for(int j=2; j<82; j++){
-         terrain[i][j] = 0;
-      }
-   }
-   //vertical border lines
-   for(int i=0; i<42; i++){
-      terrain[i][0]  = 1; terrain[i][1]  = 1;
-      terrain[i][81]  = 1; terrain[i][82]  = 1;
-   }
-   //horizontal border lines
-   for(int i=0; i<84; i++){
-      terrain[0][i]  = 1;
-      terrain[41][i]  = 1;
+   //changing colors of borders of the map
+   init_color(COLOR_MAGENTA, 0, 0, 0);
+   init_pair(4, COLOR_MAGENTA , COLOR_BLACK);
+   wattron(map, COLOR_PAIR(4));
+   for(int i=0; i<42; i++){//printing vertical borders
+      mvwprintw(map, i, 0, "\u2588"); mvwprintw(map, i, 1, "\u2588");
+      mvwprintw(map, i, 81, "\u2588"); mvwprintw(map, i, 82, "\u2588");
    }
 
-   //printing out obstacles
-   for(int i=0; i<42; i++){
-      for (int j=0; j<83; j++){
-         if(terrain[i][j] == 1){
-            mvwprintw(map, i, j, "\u2588");
-         }
-      }
+   for(int i=2; i<81; i++){//printing horizontal borders
+      mvwprintw(map, 0, i, "\u2588"); 
+      mvwprintw(map, 41, i, "\u2588");
    }
    
+   wattroff(map, COLOR_PAIR(4));
    wrefresh(map);
 
    return map;
 }
 
+int create_terrain(int areas[40][80]){
+   //zeroing out every of individual areas
+   for(int i=0; i<40; i++){
+      for(int j=0; j<80; j++){
+         areas[i][j] = 0;
+      }
+   }
+   
+   areas[15][56] = 1; areas[18][33] = 1;    
+}
+
+void draw_terrain(WINDOW *map, int areas[40][80]){
+   for(int i=0; i<40; i++){
+      for(int j=0; j<80; j++){
+         if(areas[i][j])
+            mvwprintw(map, i, j, "\u2588");
+      }
+   }
+   wrefresh(map);
+}
 int main() {
    set_game_enviroment();
    display_banner();
