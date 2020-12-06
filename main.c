@@ -1,10 +1,11 @@
 //Konrad Maciejczyk, 2020"
-//clear && gcc main.c -o binaries/main -lncursesw && ./binaries/main
+//clear && gcc main.c map_elements.c -o binaries/main -lncursesw && ./binaries/main
 #include <stdlib.h>
 #include <ncurses.h>
 #include <menu.h>
 #include <locale.h>
 #include <wchar.h>
+#include <time.h>
 
 void credits(); void set_layout(); void update_stats(); void game(); void how_to_play(); void hall_of_fame();
 WINDOW *create_hud(); WINDOW *create_map(); int create_terrain(); void draw_terrain();
@@ -74,12 +75,12 @@ void display_banner(){
 void main_menu(){ 
    int row, col; getmaxyx(stdscr, row, col);
 
-   int menu_width = 50, menu_height = 10, menu_pos_x = col/2 - 25, menu_pos_y = row - 22; //Creating window for opton menu_win
+   int menu_width = 50, menu_height = 10, menu_pos_x = col/2 - 25, menu_pos_y = row - 22; //Creating window for option menu_win
    WINDOW *menu_win = newwin(10, 50, menu_pos_y, menu_pos_x);
    refresh();
    wrefresh(menu_win);
 
-   keypad(menu_win, true); //Allows to use arrows in order to pick up options from menu
+   keypad(menu_win, true); //Allows to use arrows in order to select options from menu
 
    char MENU_OPTIONS[5][13] = {"New Game", "Hall of Fame", "How to play", "Credits", "Quit Game"};
 
@@ -223,17 +224,17 @@ WINDOW *create_map(){
    WINDOW *map;
    //calculating place for centering the map 
    int row, col; getmaxyx(stdscr, row, col); row = row / 2 - 23; col = col / 2 - 60;
-   map = newwin(42, 83, row + 2, col + 28);
+   map = newwin(42, 84, row + 2, col + 28);
    //changing colors of borders of the map
    init_color(COLOR_MAGENTA, 0, 0, 0);
    init_pair(4, COLOR_MAGENTA , COLOR_BLACK);
    wattron(map, COLOR_PAIR(4));
    for(int i=0; i<42; i++){//printing vertical borders
       mvwprintw(map, i, 0, "\u2588"); mvwprintw(map, i, 1, "\u2588");
-      mvwprintw(map, i, 81, "\u2588"); mvwprintw(map, i, 82, "\u2588");
+      mvwprintw(map, i, 82, "\u2588"); mvwprintw(map, i, 83, "\u2588");
    }
 
-   for(int i=2; i<81; i++){//printing horizontal borders
+   for(int i=2; i<82; i++){//printing horizontal borders
       mvwprintw(map, 0, i, "\u2588"); 
       mvwprintw(map, 41, i, "\u2588");
    }
@@ -244,6 +245,48 @@ WINDOW *create_map(){
    return map;
 }
 
+void make_block(int areas[40][80], int block_num, int x, int y){
+   switch (block_num){
+      case 0:{
+         extern int LR[10][20];
+         for(int i=0; i<10; i++){
+            for(int j=0; j<20; j++){
+               areas[i + y][j + x] = LR[i][j];
+            }
+         }
+         break;
+      }
+      case 1:{
+         extern int LRD[10][20];
+         for(int i=0; i<10; i++){
+            for(int j=0; j<20; j++){
+               areas[i + y][j + x] = LRD[i][j];
+            }
+         }
+         break;
+         }
+
+      case 2:{
+         extern int LRT[10][20];
+         for(int i=0; i<10; i++){
+            for(int j=0; j<20; j++){
+               areas[i + y][j + x] = LRT[i][j];
+            }
+         }
+         break;
+      }
+      case 3:{
+         extern int LRTD[10][20];
+         for(int i=0; i<10; i++){
+            for(int j=0; j<20; j++){
+               areas[i + y][j + x] = LRTD[i][j];
+            }
+         }
+         break;
+      }
+   }   
+}
+
 int create_terrain(int areas[40][80]){
    //zeroing out every of individual areas
    for(int i=0; i<40; i++){
@@ -251,15 +294,62 @@ int create_terrain(int areas[40][80]){
          areas[i][j] = 0;
       }
    }
+
+   srand(time(NULL));
+   int prev_pos_x = rand()%4*20, prev_pos_y = 0;
    
-   areas[15][56] = 1; areas[18][33] = 1;    
+   extern int LRTD[10][20];
+   
+   int block_num = rand()%4;
+   make_block(areas, block_num, prev_pos_x, 0);
+
+   bool stop_generate = false;
+   int new_pos_x = prev_pos_x, new_pos_y = prev_pos_y;
+   int direction = rand()%3;
+   while(!stop_generate){
+      switch (direction){
+         case 0: //move right
+            if(new_pos_x < 60){
+               new_pos_x = new_pos_x + 20;
+               direction = rand()%3 == 1 ? 0:2;
+
+               block_num = rand()%4;
+               make_block(areas, block_num, new_pos_x, new_pos_y);               
+            }
+            else
+               direction = rand()%3 == 0 ? 1:2;            
+            break;
+         case 1: //move left
+            if(new_pos_x > 0){
+               new_pos_x = new_pos_x - 20;
+               direction = rand()%3 == 0 ? 1:2;
+
+               block_num = rand()%4;
+               make_block(areas, block_num, new_pos_x, new_pos_y);
+            }
+            else
+               direction = rand()%3 == 1 ? 0:2;            
+            break;
+         case 2: //move down
+            if (new_pos_y < 30){
+               new_pos_y = new_pos_y + 10;
+               direction = rand()%3;
+
+               block_num = rand()%2 + 2;
+               make_block(areas, block_num, new_pos_x, new_pos_y);
+            }
+            else
+               stop_generate = !stop_generate;            
+            break;           
+      }
+   }
 }
 
 void draw_terrain(WINDOW *map, int areas[40][80]){
-   for(int i=0; i<40; i++){
-      for(int j=0; j<80; j++){
+   for(int i=0; i<40; i++){//rows
+      for(int j=0; j<80; j++){//columns
          if(areas[i][j])
-            mvwprintw(map, i, j, "\u2588");
+            mvwprintw(map, i+1, j+2, "\u2588");
       }
    }
    wrefresh(map);
