@@ -10,7 +10,6 @@
 void credits(); void set_layout(); void update_stats(); void game(); void how_to_play(); void hall_of_fame();
 WINDOW *create_hud(); WINDOW *create_map(); int create_terrain(); void draw_terrain();
 
-
 void set_game_enviroment(){
    system("printf '\e[8;50;150t'"); //Setting user terminal to 150x50
 
@@ -224,11 +223,7 @@ WINDOW *create_map(){
    WINDOW *map;
    //calculating place for centering the map 
    int row, col; getmaxyx(stdscr, row, col); row = row / 2 - 23; col = col / 2 - 60;
-   map = newwin(42, 84, row + 2, col + 28);
-   //changing colors of borders of the map
-   init_color(COLOR_MAGENTA, 0, 0, 0);
-   init_pair(4, COLOR_MAGENTA , COLOR_BLACK);
-   wattron(map, COLOR_PAIR(4));
+   map = newwin(42, 84, row + 2, col + 28);;
    for(int i=0; i<42; i++){//printing vertical borders
       mvwprintw(map, i, 0, "\u2588"); mvwprintw(map, i, 1, "\u2588");
       mvwprintw(map, i, 82, "\u2588"); mvwprintw(map, i, 83, "\u2588");
@@ -238,16 +233,15 @@ WINDOW *create_map(){
       mvwprintw(map, 0, i, "\u2588"); 
       mvwprintw(map, 41, i, "\u2588");
    }
-   
-   wattroff(map, COLOR_PAIR(4));
    wrefresh(map);
 
    return map;
 }
 
 void make_block(int areas[40][80], int block_num, int x, int y){
+   //printw("%i, ", block_num);
    switch (block_num){
-      case 0:{
+      case 0:{ 
          extern int LR[10][20];
          for(int i=0; i<10; i++){
             for(int j=0; j<20; j++){
@@ -264,9 +258,9 @@ void make_block(int areas[40][80], int block_num, int x, int y){
             }
          }
          break;
-         }
+      }
 
-      case 2:{
+      case 2:{;
          extern int LRT[10][20];
          for(int i=0; i<10; i++){
             for(int j=0; j<20; j++){
@@ -286,19 +280,31 @@ void make_block(int areas[40][80], int block_num, int x, int y){
       }
    }   
 }
+void make_random_block(int areas[40][80], int x, int y){
+   int aux;
+   //printw("%i, %i | ", x, y);
+   
+   for(int i=x; i<x+10; i++){
+      for(int j=y; j<y+19; j=j+2){
+         if(rand()%7 < 2){
+            areas[i][j] = 1; areas[i][j+1] = 1;
+         }
+      }
+   }
+   
+}
 
 int create_terrain(int areas[40][80]){
    //zeroing out every of individual areas
    for(int i=0; i<40; i++){
-      for(int j=0; j<80; j++){
+      for(int j=0; j<80; j++)
          areas[i][j] = 0;
       }
-   }
 
    srand(time(NULL));
    int prev_pos_x = rand()%4*20, prev_pos_y = 0;
    
-   extern int LRTD[10][20];
+   //extern int LRTD[10][20];
    
    int block_num = rand()%4;
    make_block(areas, block_num, prev_pos_x, 0);
@@ -307,6 +313,7 @@ int create_terrain(int areas[40][80]){
    int new_pos_x = prev_pos_x, new_pos_y = prev_pos_y;
    int direction = rand()%3;
    while(!stop_generate){
+      //printw("x=%i, y=%i, block_num=%i | ", new_pos_x, new_pos_y, block_num);
       switch (direction){
          case 0: //move right
             if(new_pos_x < 60){
@@ -328,21 +335,37 @@ int create_terrain(int areas[40][80]){
                make_block(areas, block_num, new_pos_x, new_pos_y);
             }
             else
-               direction = rand()%3 == 1 ? 0:2;            
+               //direction = rand()%3 == 1 ? 0:2;            
+               direction = 2;
             break;
          case 2: //move down
             if (new_pos_y < 30){
+               if (block_num == 0 || block_num == 2)//0=LR, 2=LRT, 1=LRD, 3=LRTD
+                  make_block(areas, rand()%2 == 0 ? 1:3, new_pos_x, new_pos_y);
                new_pos_y = new_pos_y + 10;
                direction = rand()%3;
 
                block_num = rand()%2 + 2;
+               
                make_block(areas, block_num, new_pos_x, new_pos_y);
             }
             else
                stop_generate = !stop_generate;            
-            break;           
+            break;         
+      }
+      //printw(", block_num=%i | ", block_num);
+      
+   }
+
+   for(int i=0; i < 40; i=i+10){
+      for(int j=0; j < 80; j=j+20){
+         if(areas[i][j] == 0){
+            //printw("x:%i, y:%i | ", i, j);
+            make_random_block(areas, i, j);
+         }
       }
    }
+   
 }
 
 void draw_terrain(WINDOW *map, int areas[40][80]){
