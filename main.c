@@ -8,7 +8,7 @@
 #include <time.h>
 
 void credits(); void set_layout(); void update_stats(); void game(); void how_to_play(); void hall_of_fame();
-WINDOW *create_hud(); WINDOW *create_map(); int create_terrain(); void draw_terrain();
+WINDOW *create_hud(); WINDOW *create_map(); int create_terrain(); void draw_terrain(); void draw_end_point();
 
 void set_game_enviroment(){
    system("printf '\e[8;50;150t'"); //Setting user terminal to 150x50
@@ -174,12 +174,13 @@ void credits(){
 void game(char nazwa[9]){
    clear(); refresh();
    WINDOW *hud, *map;   
-   
+   int start_end_point[2]; //player spawn point[0], level exit[1]
    hud = create_hud(nazwa);
    map = create_map();
    int areas[40][80];
-   create_terrain(areas);
+   create_terrain(areas, start_end_point);
    draw_terrain(map, areas);
+   draw_end_point(map, start_end_point[1]);
 }
 
 WINDOW *create_hud(char nazwa[9]){
@@ -238,8 +239,7 @@ WINDOW *create_map(){
    return map;
 }
 
-void make_block(int areas[40][80], int block_num, int x, int y){
-   //printw("%i, ", block_num);
+void make_block(int areas[40][80], int block_num, int x, int y){;
    switch (block_num){
       case 0:{ 
          extern int LR[10][20];
@@ -281,30 +281,35 @@ void make_block(int areas[40][80], int block_num, int x, int y){
    }   
 }
 void make_random_block(int areas[40][80], int x, int y){
-   int aux;
-   //printw("%i, %i | ", x, y);
-   
-   for(int i=x; i<x+10; i++){
+   make_block(areas, rand()%3, y, x); //creating random block from presets
+   for(int i=x; i<x+10; i++){ //adding extra randomness on top of presets
       for(int j=y; j<y+19; j=j+2){
-         if(rand()%7 < 2){
+         if(rand()%25 < 2){
             areas[i][j] = 1; areas[i][j+1] = 1;
          }
       }
-   }
-   
+   }   
 }
 
-int create_terrain(int areas[40][80]){
+void draw_end_point(WINDOW *map, int end_point){
+   printw("%i", end_point);
+   init_pair(3, COLOR_YELLOW, COLOR_BLACK);   
+   wattron(map, COLOR_PAIR(3));   
+   mvwprintw(map, 35, end_point, "\u2588"); wprintw(map, "\u2588");
+   wattroff(map, COLOR_PAIR(3));
+   wrefresh(map);
+}
+
+int create_terrain(int areas[40][80], int start_end_point[2]){
    //zeroing out every of individual areas
    for(int i=0; i<40; i++){
       for(int j=0; j<80; j++)
          areas[i][j] = 0;
       }
-
+   //creating first block
    srand(time(NULL));
    int prev_pos_x = rand()%4*20, prev_pos_y = 0;
-   
-   //extern int LRTD[10][20];
+   start_end_point[0] = prev_pos_x + 2;
    
    int block_num = rand()%4;
    make_block(areas, block_num, prev_pos_x, 0);
@@ -313,7 +318,7 @@ int create_terrain(int areas[40][80]){
    int new_pos_x = prev_pos_x, new_pos_y = prev_pos_y;
    int direction = rand()%3;
    while(!stop_generate){
-      //printw("x=%i, y=%i, block_num=%i | ", new_pos_x, new_pos_y, block_num);
+      //loop creating major, traversible path
       switch (direction){
          case 0: //move right
             if(new_pos_x < 60){
@@ -341,6 +346,7 @@ int create_terrain(int areas[40][80]){
          case 2: //move down
             if (new_pos_y < 30){
                if (block_num == 0 || block_num == 2)//0=LR, 2=LRT, 1=LRD, 3=LRTD
+                  //making sure, that upper block has hole in the floor, so the player can transit between blocks
                   make_block(areas, rand()%2 == 0 ? 1:3, new_pos_x, new_pos_y);
                new_pos_y = new_pos_y + 10;
                direction = rand()%3;
@@ -357,6 +363,8 @@ int create_terrain(int areas[40][80]){
       
    }
 
+   start_end_point[1] = new_pos_x+2;
+   //loop for creating random maze
    for(int i=0; i < 40; i=i+10){
       for(int j=0; j < 80; j=j+20){
          if(areas[i][j] == 0){
