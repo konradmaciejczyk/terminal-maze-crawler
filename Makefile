@@ -1,8 +1,8 @@
 game: main.c map_elements.c
-	gcc main.c map_elements.c -o binaries/game -lncursesw
+	clear && gcc *.c -o binaries/game -lncursesw && binaries/game
 clean:
 	rm binaries/game
 debug:
-	gcc -g main.c map_elements.c -o binaries/game -lncursesw
+	clear && gcc *.c -lncursesw && gdb binaries/game
 run:
 	clear && ./binaries/game
