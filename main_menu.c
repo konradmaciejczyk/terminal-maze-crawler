@@ -1,4 +1,6 @@
 //Konrad Maciejczyk, 2020
+/*This file is responisble for menu display including, banner display, main menu, hall of fame, credits, options, quit game. 
+Here I set terminal for optimal size (150, 50)*/
 #include <stdlib.h>
 #include <ncurses.h>
 #include <menu.h>

@@ -1,11 +1,12 @@
 //Konrad Maciejczyk, 2020"
-//clear && gcc main.c map_elements.c main_menu.h map_generation.h -o binaries/main -lncursesw && ./binaries/main
+//clear && gcc *.c -o binaries/main -lncursesw && ./binaries/main
 #include <stdlib.h>
 #include <ncurses.h>
 
 extern void set_game_enviroment(); extern void display_banner(); extern void main_menu();
 extern WINDOW *create_hud(); extern WINDOW *create_map(); extern void create_terrain();
-extern void draw_terrain(); extern void draw_end_point();
+extern void draw_terrain(); extern void draw_end_point(); extern void spawn_coins();
+extern void spawn_player(); extern void player_movement();
 
 void game(char nazwa[9]){
    clear(); refresh();
@@ -15,9 +16,14 @@ void game(char nazwa[9]){
    map = create_map();
    int areas[40][80];
    create_terrain(areas, start_end_point);
-   areas[6][start_end_point[0]] = 2; areas[35][start_end_point[1]] = 3; 
+   areas[6][start_end_point[0]] = 2; areas[35][start_end_point[1]] = 3;
+   spawn_coins(map, areas); 
    draw_terrain(map, areas);
    draw_end_point(map, &start_end_point[1]);
+   spawn_player(map, &start_end_point[0]);
+
+   player_movement(map, areas, &start_end_point[0]);
+   
 }
 
 int main() {

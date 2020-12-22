@@ -1,4 +1,7 @@
 //Konrad Maciejczyk, 2020
+/*This file contains all map generation procedures including: creating path between player spawn point end level, random obstacle creation,
+coin spawning, player and level exit spawning.
+*/
 #include <stdlib.h>
 #include <ncurses.h>
 #include <locale.h>
@@ -185,15 +188,58 @@ void create_terrain(int areas[40][80], int start_end_point[2]){
             make_random_block(areas, i, j);
          }
       }
-   }   
+   }
+
+   FILE *fp; //definicja zmiennej wskaźnikowej typu FILE;
+   fp=fopen("test.txt", "w");//w - do napisywania
+   for(int i=0; i<40; i++){
+      for(int j=0; j<80; j++)
+         fprintf(fp, "(%i, %i| %i) ", i, j, areas[i][j]);
+      fprintf(fp, "\n");      
+   }
+   fclose(fp);
+   
 }
 
 void draw_terrain(WINDOW *map, int areas[40][80]){
+   init_pair(3, COLOR_GREEN, COLOR_BLACK);
+   init_color(COLOR_MAGENTA, 790, 50, 750); init_pair(1, COLOR_MAGENTA, COLOR_BLACK); 
    for(int i=0; i<40; i++){//rows
       for(int j=0; j<80; j++){//columns
-         if(areas[i][j] == 1)
+         if(areas[i][j] == 1)//draw obstacle
             mvwprintw(map, i+1, j+2, "\u2588");
+         else if(areas[i][j] == 4){//draw ordinary coin
+            wattron(map, COLOR_PAIR(3));
+            mvwprintw(map, i+1, j+2, "\u2022");
+            wattroff(map, COLOR_PAIR(3));
+         }
+         else if(areas[i][j] == 5){//draw extraordinary coin
+            wattron(map, COLOR_PAIR(1));
+            mvwprintw(map, i+1, j+2, "\u2022");
+            wattroff(map, COLOR_PAIR(1));
+         }
       }
    }
    wrefresh(map);
+}
+
+void spawn_coins(WINDOW *map, int areas[40][80]){   
+   for(int i=0; i<40; i++){
+      for(int j=0; j<80; j++){
+         if(areas[i][j] == 0){
+            if(rand()%40 < 2)
+               areas[i][j] = 4;
+            else if(rand()%250 < 2)
+               areas[i][j] = 5;
+         }
+      }
+   }   
+}
+
+void spawn_player(WINDOW *map, int *start_point){
+    init_pair(5, COLOR_BLUE, COLOR_BLACK); //\u263A
+    wattron(map, COLOR_PAIR(5)); wattron(map, A_BOLD); //wattron(map, A_STANDOUT);
+    mvwprintw(map, 6, *start_point, "&");
+    wattroff(map, COLOR_PAIR(5)); wattroff(map, A_BOLD); //wattroff(map, A_STANDOUT);
+    wrefresh(map);
 }
