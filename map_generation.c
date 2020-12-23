@@ -64,7 +64,7 @@ WINDOW *create_map(){
    return map;
 }
 
-void make_block(int areas[40][80], int block_num, int x, int y){;
+void make_block(int areas[40][80], int block_num, int x, int y){
    int *block;
    switch (block_num){
       case 0:{ 
@@ -78,19 +78,20 @@ void make_block(int areas[40][80], int block_num, int x, int y){;
          break;
       }
 
-      case 2:{;
+      case 2:{
          extern int LRT[10][20];
          block = &LRT[0][0];
          break;
       }
+
       case 3:{
          extern int LRTD[10][20];
          block = &LRTD[0][0];
          break;
       }
    }
-
-   int ptr_i = 1;
+   
+   int ptr_i = 0;
    for(int i=0; i<10; i++){
       for(int j=0; j<20; j++){
          areas[i + y][j + x] = *(block + ptr_i);
@@ -108,14 +109,6 @@ void make_random_block(int areas[40][80], int x, int y){
          }
       }
    }   
-}
-
-void draw_end_point(WINDOW *map, int *end_point){
-   init_pair(3, COLOR_YELLOW, COLOR_BLACK);   
-   wattron(map, COLOR_PAIR(3));   
-   mvwprintw(map, 35, *end_point, "\u2588"); wprintw(map, "\u2588");
-   wattroff(map, COLOR_PAIR(3));
-   wrefresh(map);
 }
 
 void create_terrain(int areas[40][80], int start_end_point[2]){
@@ -177,7 +170,7 @@ void create_terrain(int areas[40][80], int start_end_point[2]){
                stop_generate = !stop_generate;            
             break;         
       } 
-   }
+   }   
 
    start_end_point[1] = new_pos_x+16;
 
@@ -188,20 +181,10 @@ void create_terrain(int areas[40][80], int start_end_point[2]){
             make_random_block(areas, i, j);
          }
       }
-   }
-
-   FILE *fp; //definicja zmiennej wskaźnikowej typu FILE;
-   fp=fopen("test.txt", "w");//w - do napisywania
-   for(int i=0; i<40; i++){
-      for(int j=0; j<80; j++)
-         fprintf(fp, "(%i, %i| %i) ", i, j, areas[i][j]);
-      fprintf(fp, "\n");      
-   }
-   fclose(fp);
-   
+   }   
 }
 
-void draw_terrain(WINDOW *map, int areas[40][80]){
+void draw_terrain(WINDOW *map, int areas[40][80], int start_end_point[2]){
    init_pair(3, COLOR_GREEN, COLOR_BLACK);
    init_color(COLOR_MAGENTA, 790, 50, 750); init_pair(1, COLOR_MAGENTA, COLOR_BLACK); 
    for(int i=0; i<40; i++){//rows
@@ -220,6 +203,17 @@ void draw_terrain(WINDOW *map, int areas[40][80]){
          }
       }
    }
+   //player
+   init_pair(5, COLOR_BLUE, COLOR_BLACK); //\u263A
+   wattron(map, COLOR_PAIR(5)); wattron(map, A_BOLD); //wattron(map, A_STANDOUT);
+   mvwprintw(map, 7, start_end_point[0]+2, "&");
+   wattroff(map, COLOR_PAIR(5)); wattroff(map, A_BOLD); //wattroff(map, A_STANDOUT);
+   wrefresh(map);
+   //level exit
+   init_pair(3, COLOR_YELLOW, COLOR_BLACK);   
+   wattron(map, COLOR_PAIR(3));   
+   mvwprintw(map, 36, start_end_point[1]+2, "\u2588"); wprintw(map, "\u2588");
+   wattroff(map, COLOR_PAIR(3));
    wrefresh(map);
 }
 
@@ -234,12 +228,4 @@ void spawn_coins(WINDOW *map, int areas[40][80]){
          }
       }
    }   
-}
-
-void spawn_player(WINDOW *map, int *start_point){
-    init_pair(5, COLOR_BLUE, COLOR_BLACK); //\u263A
-    wattron(map, COLOR_PAIR(5)); wattron(map, A_BOLD); //wattron(map, A_STANDOUT);
-    mvwprintw(map, 6, *start_point, "&");
-    wattroff(map, COLOR_PAIR(5)); wattroff(map, A_BOLD); //wattroff(map, A_STANDOUT);
-    wrefresh(map);
 }
