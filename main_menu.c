@@ -19,7 +19,6 @@ void set_game_enviroment(){
       printf("To play this game your terminal must support color display.");
       exit(1);
    }
-
    start_color(); //start colorful display
    init_pair(1, COLOR_WHITE, COLOR_BLACK); //Setting background color
 }
@@ -142,15 +141,7 @@ void main_menu(){
    {
     case 0:
         //Getting player's name
-        wclear(menu_win);
-        int row, col; getmaxyx(menu_win, row, col); col = col / 2 - 8;
-        mvwprintw(menu_win, 0, col, "Enter your name:");
-        wmove(menu_win, 2, col + 4);
-        char nazwa[9];
-        wgetnstr(menu_win, nazwa, 8);   
-        wrefresh(menu_win);
-
-        game(nazwa);
+        game(menu_win);
         break;
     case 1:
         hall_of_fame();

@@ -8,16 +8,17 @@ coin spawning, player and level exit spawning.
 #include <wchar.h>
 #include <time.h>
 
-WINDOW *create_hud(char nazwa[9]){
+WINDOW *create_hud(){
    int row = 3, col =15;
    WINDOW *hud = newwin(44, 24, row, col);
    init_pair(3, COLOR_YELLOW, COLOR_BLACK);
-
+   extern char players_name[9];
+   
    wborder(hud, ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ');
    //Player name
    mvwprintw(hud, 3, 5, "Player: ");
    wattron(hud, COLOR_PAIR(3));
-   wprintw(hud, "%s", nazwa);
+   wprintw(hud, "%s", players_name);
    wattroff(hud, COLOR_PAIR(3));
    //Players health
    mvwprintw(hud, 12, 5, "health: ");
