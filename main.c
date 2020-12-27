@@ -10,7 +10,7 @@ extern void draw_terrain(); extern void spawn_coins(); extern void player_moveme
 int score = 0;
 char players_name[9];
 WINDOW *hud;
-int game_time = 600; 
+int game_time = 599; 
 
 void get_players_name(WINDOW *menu_win){
    wclear(menu_win);
@@ -25,7 +25,8 @@ void get_players_name(WINDOW *menu_win){
 void game(WINDOW *menu_win){
 
    int start_end_point[2]; //player spawn point[0], level exit[1]
-   int areas[40][80]; //matrix representing level in cartesian coordinates   
+   int areas[40][80]; //matrix representing level in cartesian coordinates
+   //0 - free area, 1 - obstacle, 2 - player, 3 - level exit, 4 - ordinary coin, 5 - extraordinary coin, 6 - bomb
    WINDOW *map; 
    get_players_name(menu_win);
    clear(); refresh(); 

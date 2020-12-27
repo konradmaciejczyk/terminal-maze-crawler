@@ -15,7 +15,7 @@ WINDOW *create_hud(){
    extern char players_name[9];
    
    wborder(hud, ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ');
-   //Player name
+   //Players name
    mvwprintw(hud, 3, 5, "Player: ");
    wattron(hud, COLOR_PAIR(3));
    wprintw(hud, "%s", players_name);
@@ -28,7 +28,7 @@ WINDOW *create_hud(){
    //Time left
    mvwprintw(hud, 15, 5, "time: ");
    wattron(hud, COLOR_PAIR(3));
-   wprintw(hud, "10:00");
+   wprintw(hud, " ");
    wattroff(hud, COLOR_PAIR(3));
    //Score
    mvwprintw(hud, 18, 5, "score: ");
@@ -78,13 +78,11 @@ void make_block(int areas[40][80], int block_num, int x, int y){
          block = &LRD[0][0];
          break;
       }
-
       case 2:{
          extern int LRT[10][20];
          block = &LRT[0][0];
          break;
       }
-
       case 3:{
          extern int LRTD[10][20];
          block = &LRTD[0][0];
@@ -97,7 +95,7 @@ void make_block(int areas[40][80], int block_num, int x, int y){
       for(int j=0; j<20; j++){
          areas[i + y][j + x] = *(block + ptr_i);
          ptr_i++;
-         }
+      }
    }
 }
 
@@ -133,7 +131,7 @@ void create_terrain(int areas[40][80], int start_end_point[2]){
    while(!stop_generate){
       //loop creating major, traversible path
       switch (direction){
-         case 0: //move right
+         case 0:{ //move right
             if(new_pos_x < 60){
                new_pos_x = new_pos_x + 20;
                direction = rand()%3 == 1 ? 0:2;
@@ -144,7 +142,8 @@ void create_terrain(int areas[40][80], int start_end_point[2]){
             else
                direction = rand()%3 == 0 ? 1:2;            
             break;
-         case 1: //move left
+         }
+         case 1:{ //move left
             if(new_pos_x > 0){
                new_pos_x = new_pos_x - 20;
                direction = rand()%3 == 0 ? 1:2;
@@ -155,7 +154,8 @@ void create_terrain(int areas[40][80], int start_end_point[2]){
             else
                direction = rand()%3 == 1 ? 0:2;
             break;
-         case 2: //move down
+         }
+         case 2:{ //move down
             if (new_pos_y < 30){
                if (block_num == 0 || block_num == 2)//0=LR, 2=LRT, 1=LRD, 3=LRTD
                   //making sure, that upper block has hole in the floor, so the player can transit between blocks
@@ -169,7 +169,8 @@ void create_terrain(int areas[40][80], int start_end_point[2]){
             }
             else
                stop_generate = !stop_generate;            
-            break;         
+            break; 
+         }        
       } 
    }   
 
