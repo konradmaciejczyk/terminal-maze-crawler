@@ -7,7 +7,7 @@ Here I set terminal for optimal size (150, 50)*/
 #include <locale.h>
 #include <wchar.h>
 
-void main_menu(); extern void game();
+void main_menu(); extern void game(); extern void quit_game();
 
 void set_game_enviroment(){
    system("printf '\e[8;50;150t'"); //Setting user terminal to 150x50
@@ -21,11 +21,6 @@ void set_game_enviroment(){
    }
    start_color(); //start colorful display
    init_pair(1, COLOR_WHITE, COLOR_BLACK); //Setting background color
-}
-
-void quit_game(){
-   endwin();
-   exit(0);
 }
 
 void display_banner(){
@@ -115,10 +110,9 @@ void main_menu(){
          mvwprintw(menu_win, i+1, 19, MENU_OPTIONS[i]);       
          wattroff(menu_win, A_REVERSE);       
       }
-         choice = wgetch(menu_win);  
+      choice = wgetch(menu_win);  
 
-         switch (choice)
-         {
+      switch (choice){
          case KEY_UP:
             highlight--;
             if (highlight == -1)
@@ -131,16 +125,16 @@ void main_menu(){
             break;         
          default:
             break;
-         }
-         if(choice == 10){
-            break;
-         }
+      }
+      
+      if(choice == 10){
+         break;
+      }
    }
 
    switch (highlight)
    {
     case 0:
-        //Getting player's name
         game(menu_win);
         break;
     case 1:

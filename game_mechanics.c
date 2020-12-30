@@ -13,7 +13,64 @@ void update_score(){
    wattron(hud, COLOR_PAIR(3));
    mvwprintw(hud, 18, 12, "%i", score);
    wattroff(hud, COLOR_PAIR(3));
-   wrefresh(hud);
+   wrefresh(hud);   
+}
+
+bool pause_menu(){
+    WINDOW *pause_menu = newwin(10, 22, 30, 13);
+    wborder(pause_menu, '*', '*', '*', '*', '*', '*', '*', '*');
+    wattron(pause_menu, A_BOLD); wattron(pause_menu, A_BLINK);
+    mvwprintw(pause_menu, 1, 8, "PAUSED");
+    wattroff(pause_menu, A_BOLD); wattroff(pause_menu, A_BLINK);
+    wrefresh(pause_menu); refresh();
+
+    keypad(pause_menu, true);
+    char P_MENU_OPTIONS[2][10] = {"Resume", "Quit Game"};
+
+    int highlight = 0, choice;
+
+    while(1){
+        for(int i=0; i<2; i++){
+            if(i == highlight){
+                wattron(pause_menu, A_REVERSE);
+            }
+            mvwprintw(pause_menu, i+4, 7, P_MENU_OPTIONS[i]);
+            wattroff(pause_menu, A_REVERSE);
+        }
+        choice = wgetch(pause_menu);
+
+        switch(choice){
+            case KEY_UP:
+                highlight--;
+                if(highlight == -1)
+                    highlight = 0;
+                break;
+            case KEY_DOWN:
+                highlight++;
+                if(highlight == 2)
+                    highlight = 1;
+                break;
+            default:
+                break;
+        } 
+
+        if (choice == 10){
+            break;
+        }       
+    }
+
+    switch(highlight){
+        case 0:
+            for(int i=0; i<10; i++){
+                for(int j=0; j<22; j++){
+                    mvwprintw(pause_menu, i, j, " ");
+                }
+            }
+            wrefresh(pause_menu);
+            delwin(pause_menu); refresh(); return true;
+        case 1:
+            return false;
+    }
 }
 
 void update_time(int timer){
@@ -197,11 +254,21 @@ bool player_movement(WINDOW *map, int areas[40][80], int *start_pos){
                 break;
             }
             case KEY_BACKSPACE:{
-                if(is_bomb_planted == false)
+                if(is_bomb_planted == false){
                     is_bomb_planted = plant_a_bomb(map, areas, last_direction, player_pos_x, player_pos_y, &bomb_pos_x, &bomb_pos_y);
                     planted_at = time(NULL);
-                    printw("%i, %i", bomb_pos_x, bomb_pos_y); refresh();
+                }break;
             }
+            case KEY_HOME:
+                game_time = time_left;
+                //current = time(NULL); now = current;
+                if(pause_menu()){
+                    time_left = game_time;
+                    current = time(NULL); now = current;
+                    break;
+                }else{
+                    return false;
+                }
             default:
                 break;
         }
@@ -221,5 +288,6 @@ bool player_movement(WINDOW *map, int areas[40][80], int *start_pos){
         if(is_bomb_planted)// if bomb has been planted, count the time to exploion
             is_bomb_planted = bomb_countdown(map, planted_at, now, areas, bomb_pos_x, bomb_pos_y);
     }
+    delwin(map); delwin(hud);
     return false; 
 }

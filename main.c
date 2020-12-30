@@ -10,9 +10,32 @@ extern void draw_terrain(); extern void spawn_coins(); extern bool player_moveme
 int score = 0;
 char players_name[9];
 WINDOW *hud, *map;
-int game_time = 10;
+int game_time = 20;
 int health = 3; 
 int map_num = 1;
+
+void quit_game(){
+   endwin();
+   exit(0);
+}
+
+void game_over_screen(){   
+   clear(); refresh();
+   int row = 50, col=150;
+   WINDOW *game_over = newwin(50, 150, 0, 0);
+   init_pair(9, COLOR_RED, COLOR_BLACK); wattron(game_over, COLOR_PAIR(9)); wattron(game_over, A_BOLD);
+   mvwprintw(game_over, 15, 70, "Game Over");
+   wattroff(game_over, COLOR_PAIR(9)); wattroff(game_over, A_BOLD);
+   mvwprintw(game_over, 18, 69, "Your score:");
+   wattron(game_over, A_BOLD);
+   mvwprintw(game_over, 20, 63, "NAME     SCORE     LEVEL",players_name, score, map_num);
+   wattroff(game_over, A_BOLD);
+   mvwprintw(game_over, 21, 63, "%s", players_name); mvwprintw(game_over, 21, 72, "%i", score);
+   mvwprintw(game_over, 21, 82, "%i", map_num);
+   //place for a function adding player's score to hall of fame
+   score = 0; game_time = 20; health = 3; map_num = 1;
+   wrefresh(game_over); getch();
+}
 
 void get_players_name(WINDOW *menu_win){
    wclear(menu_win);
@@ -41,15 +64,18 @@ void game(WINDOW *menu_win){
       draw_terrain(map, areas, start_end_point);
 
       if(!player_movement(map, areas, &start_end_point[0])){
-         printf("Game Over!"); exit(0);
+         game_over_screen();
+         break; main_menu();
       }
    }  
 }
 
 int main() {
    set_game_enviroment();
-   display_banner();
-   main_menu();
+   while(1){
+      display_banner();
+      main_menu();
+   }
    
    getch();		
 	endwin();
