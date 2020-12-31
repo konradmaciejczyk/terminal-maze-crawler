@@ -162,10 +162,10 @@ bool plant_a_bomb(WINDOW *map, int areas[40][80], int direction, int pos_x, int 
 }
 
 void detect_a_coint(int areas[40][80], int pos_x, int pos_y){
-    if (areas[pos_x][pos_y] == 4){
+    if (areas[pos_x][pos_y] == 4){ //ordinary coin
         score += 10;
         update_score();
-    }else if(areas[pos_x][pos_y] == 5){
+    }else if(areas[pos_x][pos_y] == 5){ //extraordinary coin
         score += 50;
         update_score();
     }
@@ -193,7 +193,7 @@ void bomb_explode(WINDOW *map, int areas[40][80], int mask[3][5], int bomb_pos_x
 
 bool bomb_countdown(WINDOW *map, long long planted_at, long long now, int areas[40][80], int bomb_pos_x, int bomb_pos_y){;
     if(now - planted_at >= 2){
-        int mask[3][5] = {{1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}};
+        int mask[3][5] = {{1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}}; //mask for explosion range
         bomb_explode(map, areas, mask, bomb_pos_x, bomb_pos_y);        
         return false;    
     }return true;
@@ -202,9 +202,9 @@ bool bomb_countdown(WINDOW *map, long long planted_at, long long now, int areas[
 bool player_movement(WINDOW *map, int areas[40][80], int *start_pos){
     int player_pos_x = 6; int player_pos_y = *start_pos;
     int previous_player_pos_x = player_pos_x; int previous_player_pos_y = player_pos_y;
-    int last_direction = 0; //determinates a direction player currently is pointing     
+    int last_direction = 0; //determinates a direction player currently is pointing at    
    
-    long long current = (long long)time(NULL);
+    long long current = (long long)time(NULL); //getting time from OS for game timer
     long long now = current;
     int time_left = game_time;
     

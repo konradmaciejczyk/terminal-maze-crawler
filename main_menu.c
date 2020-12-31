@@ -1,5 +1,5 @@
 //Konrad Maciejczyk, 2020
-/*This file is responisble for menu display including, banner display, main menu, hall of fame, credits, options, quit game. 
+/*This file is responsible for menu display including, banner display, main menu, hall of fame, credits, options, quit game. 
 Here I set terminal for optimal size (150, 50)*/
 #include <stdlib.h>
 #include <ncurses.h>
@@ -71,8 +71,32 @@ void hall_of_fame(){
 }
 
 void how_to_play(){
-   printf("How to play goes here!");
-   quit_game();
+   WINDOW *h_t_p = newwin(50, 150, 0, 0);
+   wattron(h_t_p, A_BOLD); mvwprintw(h_t_p, 10, 73, "GOAL"); wattroff(h_t_p, A_BOLD);
+   mvwprintw(h_t_p, 12, 35, "The point of this game is to make through the dungeon and get to the next level.");
+   mvwprintw(h_t_p, 13, 53, "Be aware of a monster lurking in every corner.");
+   mvwprintw(h_t_p, 14, 39, "Collect coins, avoid enemies and finish the game with the highest score!");
+
+   wattron(h_t_p, A_BOLD); mvwprintw(h_t_p, 17, 70, "CONTROLS"); wattroff(h_t_p, A_BOLD);
+   mvwprintw(h_t_p, 19, 50, "ARROW UP                                Move up");
+   mvwprintw(h_t_p, 20, 50, "ARROW DOWN                              Move down");
+   mvwprintw(h_t_p, 21, 50, "ARROW LEFT                              Move left");
+   mvwprintw(h_t_p, 22, 50, "ARROW RIGHT                             Move right");
+   mvwprintw(h_t_p, 23, 50, "BACKSPACE                               Plant a bomb");
+   mvwprintw(h_t_p, 24, 50, "HOME                                    Pause menu");
+
+   init_pair(4, COLOR_BLUE, COLOR_BLACK); init_pair(1, COLOR_RED, COLOR_BLACK);
+   init_pair(2, COLOR_YELLOW, COLOR_BLACK); init_pair(3, COLOR_MAGENTA, COLOR_BLACK);   
+   wattron(h_t_p, A_BOLD); mvwprintw(h_t_p, 27, 72, "ICONS"); wattroff(h_t_p, A_BOLD);
+   wattron(h_t_p, COLOR_PAIR(4)); mvwprintw(h_t_p, 29, 50, "&"); wattroff(h_t_p, COLOR_PAIR(4)); wprintw(h_t_p, "                                        You");
+   wattron(h_t_p, COLOR_PAIR(1)); mvwprintw(h_t_p, 30, 50, "&"); wattroff(h_t_p, COLOR_PAIR(1)); wprintw(h_t_p, "                                        Enemy");
+   wattron(h_t_p, COLOR_PAIR(1)); mvwprintw(h_t_p, 31, 50, "*"); wattroff(h_t_p, COLOR_PAIR(1)); wprintw(h_t_p, "                                        Bomb");
+   wattron(h_t_p, COLOR_PAIR(2)); mvwprintw(h_t_p, 32, 50, "\u2022"); wattroff(h_t_p, COLOR_PAIR(2)); wprintw(h_t_p, "                                        Coin (x10)");
+   wattron(h_t_p, COLOR_PAIR(3)); mvwprintw(h_t_p, 33, 50, "\u2022"); wattroff(h_t_p, COLOR_PAIR(3)); wprintw(h_t_p, "                                        Coin (x50)");
+   wattron(h_t_p, COLOR_PAIR(2)); mvwprintw(h_t_p, 34, 50, "\u2588\u2588"); wattroff(h_t_p, COLOR_PAIR(2)); wprintw(h_t_p, "                                       Exit");
+
+   wrefresh(h_t_p);
+   getch();
 }
 
 void credits(){
@@ -96,9 +120,7 @@ void main_menu(){
    wrefresh(menu_win);
 
    keypad(menu_win, true); //Allows to use arrows in order to select options from menu
-
    char MENU_OPTIONS[5][13] = {"New Game", "Hall of Fame", "How to play", "Credits", "Quit Game"};
-
    int highlight = 0, choice;
 
    while(1){ //main menu 

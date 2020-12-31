@@ -10,7 +10,7 @@ extern void draw_terrain(); extern void spawn_coins(); extern bool player_moveme
 int score = 0;
 char players_name[9];
 WINDOW *hud, *map;
-int game_time = 20;
+int game_time = 300;
 int health = 3; 
 int map_num = 1;
 
@@ -33,7 +33,7 @@ void game_over_screen(){
    mvwprintw(game_over, 21, 63, "%s", players_name); mvwprintw(game_over, 21, 72, "%i", score);
    mvwprintw(game_over, 21, 82, "%i", map_num);
    //place for a function adding player's score to hall of fame
-   score = 0; game_time = 20; health = 3; map_num = 1;
+   score = 0; game_time = 300; health = 3; map_num = 1;
    wrefresh(game_over); getch();
 }
 

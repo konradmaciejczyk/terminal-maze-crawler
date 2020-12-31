@@ -8,7 +8,7 @@ coin spawning, player and level exit spawning.
 #include <wchar.h>
 #include <time.h>
 
-extern int map_num; extern int score; extern int game_time;
+extern int map_num; extern int score; extern int game_time; extern int health;
 
 WINDOW *create_hud(){
    int row = 3, col =15;
@@ -24,9 +24,11 @@ WINDOW *create_hud(){
    wattroff(hud, COLOR_PAIR(3));
    //Players health
    mvwprintw(hud, 12, 5, "health: ");
-   wattron(hud, COLOR_PAIR(2)); wattron(hud, A_BOLD);
-   wprintw(hud, "\u2665 \u2665 \u2665");
-   wattroff(hud, COLOR_PAIR(2)); wattroff(hud, A_BOLD);
+    wattron(hud, COLOR_PAIR(2)); wattron(hud, A_BOLD);
+    for(int i=0; i<health; i++){
+        wprintw(hud, "\u2665 ");
+    }
+    wattroff(hud, COLOR_PAIR(2)); wattroff(hud, A_BOLD);
    //Time left
    mvwprintw(hud, 15, 5, "time: ");
    wattron(hud, COLOR_PAIR(3));
