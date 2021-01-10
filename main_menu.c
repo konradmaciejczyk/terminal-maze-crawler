@@ -11,7 +11,6 @@ void main_menu(); extern void game(); extern void quit_game();
 
 void set_game_enviroment(){
    system("printf '\e[8;50;150t'"); //Setting user terminal to 150x50
-
    setlocale(LC_ALL, "");
    initscr(); //Initialize ncurses screen
 
@@ -72,7 +71,7 @@ void hall_of_fame(){
 
 void how_to_play(){
    WINDOW *h_t_p = newwin(50, 150, 0, 0);
-   wattron(h_t_p, A_BOLD); mvwprintw(h_t_p, 10, 73, "GOAL"); wattroff(h_t_p, A_BOLD);
+   wattron(h_t_p, A_BOLD); mvwprintw(h_t_p, 10, 72, "GOAL"); wattroff(h_t_p, A_BOLD);
    mvwprintw(h_t_p, 12, 35, "The point of this game is to make through the dungeon and get to the next level.");
    mvwprintw(h_t_p, 13, 53, "Be aware of a monster lurking in every corner.");
    mvwprintw(h_t_p, 14, 39, "Collect coins, avoid enemies and finish the game with the highest score!");
@@ -97,6 +96,7 @@ void how_to_play(){
 
    wrefresh(h_t_p);
    getch();
+   clear();
 }
 
 void credits(){

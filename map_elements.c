@@ -1,5 +1,5 @@
 //Konrad Maciejczyk, 2020
-// /*This file contains presets for major path generating algorithm*/
+/*This file contains presets for major path generating algorithm*/
 int LR[10][20] =    {{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
                      {1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1},
                      {1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1},

@@ -51,7 +51,7 @@ void game(WINDOW *menu_win){
 
    int start_end_point[2]; //player spawn point[0], level exit[1]
    int areas[40][80]; //matrix representing level in cartesian coordinates
-   //0 - free area, 1 - obstacle, 2 - player, 3 - level exit, 4 - ordinary coin, 5 - extraordinary coin, 6 - bomb
+   //0 - free area, 1 - obstacle, 2 - player, 3 - level exit, 4 - ordinary coin, 5 - extraordinary coin, 6 - bomb, 7 - enemy
    get_players_name(menu_win);
    while(1){
       clear(); refresh(); 
@@ -60,8 +60,10 @@ void game(WINDOW *menu_win){
 
       create_terrain(areas, start_end_point);
       areas[6][start_end_point[0]] = 2; areas[35][start_end_point[1]] = 3; areas[35][start_end_point[1]+1] = 3;
+      int enemy_pos_y = start_end_point[1] + 1;
+      areas[34][start_end_point[1] + 1] = 7;
       spawn_coins(map, areas); 
-      draw_terrain(map, areas, start_end_point);
+      draw_terrain(map, areas, start_end_point, enemy_pos_y);
 
       if(!player_movement(map, areas, &start_end_point[0])){
          game_over_screen();

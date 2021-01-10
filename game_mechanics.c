@@ -1,4 +1,6 @@
 //Konrad Maciejczyk, 2020
+/*Here are written functions that controls all game mechanics i.a: player's movements, collision and coins detection, pause menu, 
+time, health, score and level number update functions*/
 #include <stdlib.h>
 #include <stdio.h>
 #include <ncurses.h>
@@ -7,7 +9,7 @@
 #include <time.h>
 
 extern int score; extern int game_time; extern void update_score(); extern WINDOW *hud; extern int health;
-extern int map_num;
+extern int map_num; extern void initialize_nodes();
 
 void update_score(){
    wattron(hud, COLOR_PAIR(3));
@@ -115,6 +117,12 @@ int check_collision(int areas[40][80], int pos_x, int pos_y){
     if (pos_x < 0 || pos_y < 0 || pos_x > 39 || pos_y > 79){
         return 1;
     }
+    //enemy detection:
+    if(areas[pos_x][pos_y] == 7){
+        health -= 1;
+        update_health();
+        return 1;
+    }
     //prevention against stepping on a bomb
     if(areas[pos_x][pos_y] == 6)
         return 1;
@@ -212,6 +220,7 @@ bool player_movement(WINDOW *map, int areas[40][80], int *start_pos){
     long long planted_at = 0;
     int bomb_pos_x, bomb_pos_y;
     
+    initialize_nodes(areas);
     keypad(map, true); int key;    
     wtimeout(map, 250);    
     while(health > -1 && time_left > -1){
