@@ -193,7 +193,7 @@ void create_terrain(int areas[40][80], int start_end_point[2]){
    }   
 }
 
-void draw_terrain(WINDOW *map, int areas[40][80], int start_end_point[2], int enemy_pos_y){
+void draw_terrain(WINDOW *map, int areas[40][80], int start_end_point[2]){
    init_pair(3, COLOR_GREEN, COLOR_BLACK);
    init_color(COLOR_MAGENTA, 790, 50, 750); init_pair(1, COLOR_MAGENTA, COLOR_BLACK); 
    for(int i=0; i<40; i++){//rows
@@ -223,12 +223,6 @@ void draw_terrain(WINDOW *map, int areas[40][80], int start_end_point[2], int en
    wattron(map, COLOR_PAIR(3));   
    mvwprintw(map, 36, start_end_point[1]+2, "\u2588"); wprintw(map, "\u2588");
    wattroff(map, COLOR_PAIR(3));
-   wrefresh(map);
-   //enemy
-   init_pair(7, COLOR_RED, COLOR_BLACK); //\u263A
-   wattron(map, COLOR_PAIR(7)); wattron(map, A_BOLD); //wattron(map, A_STANDOUT);
-   mvwprintw(map, 35, enemy_pos_y+2, "&");
-   wattroff(map, COLOR_PAIR(5)); wattroff(map, A_BOLD); //wattroff(map, A_STANDOUT);
    wrefresh(map);
 }
 

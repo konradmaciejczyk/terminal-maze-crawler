@@ -1,5 +1,5 @@
 //Konrad Maciejczyk, 2020
-/*This file is responsible for menu display including, banner display, main menu, hall of fame, credits, options, quit game. 
+/*This file is responsible for menu display including, banner display, main menu, credits, options, quit game. 
 Here I set terminal for optimal size (150, 50)*/
 #include <stdlib.h>
 #include <ncurses.h>
@@ -72,9 +72,8 @@ void hall_of_fame(){
 void how_to_play(){
    WINDOW *h_t_p = newwin(50, 150, 0, 0);
    wattron(h_t_p, A_BOLD); mvwprintw(h_t_p, 10, 72, "GOAL"); wattroff(h_t_p, A_BOLD);
-   mvwprintw(h_t_p, 12, 35, "The point of this game is to make through the dungeon and get to the next level.");
-   mvwprintw(h_t_p, 13, 53, "Be aware of a monster lurking in every corner.");
-   mvwprintw(h_t_p, 14, 39, "Collect coins, avoid enemies and finish the game with the highest score!");
+   mvwprintw(h_t_p, 12, 27, "The point of this game is to make through the dungeon and get to the next level before time's up.");
+   mvwprintw(h_t_p, 13, 28, "Collect coins, blast through maze, avoid explosions and finish the game with the highest score!");
 
    wattron(h_t_p, A_BOLD); mvwprintw(h_t_p, 17, 70, "CONTROLS"); wattroff(h_t_p, A_BOLD);
    mvwprintw(h_t_p, 19, 50, "ARROW UP                                Move up");
@@ -88,11 +87,10 @@ void how_to_play(){
    init_pair(2, COLOR_YELLOW, COLOR_BLACK); init_pair(3, COLOR_MAGENTA, COLOR_BLACK);   
    wattron(h_t_p, A_BOLD); mvwprintw(h_t_p, 27, 72, "ICONS"); wattroff(h_t_p, A_BOLD);
    wattron(h_t_p, COLOR_PAIR(4)); mvwprintw(h_t_p, 29, 50, "&"); wattroff(h_t_p, COLOR_PAIR(4)); wprintw(h_t_p, "                                        You");
-   wattron(h_t_p, COLOR_PAIR(1)); mvwprintw(h_t_p, 30, 50, "&"); wattroff(h_t_p, COLOR_PAIR(1)); wprintw(h_t_p, "                                        Enemy");
-   wattron(h_t_p, COLOR_PAIR(1)); mvwprintw(h_t_p, 31, 50, "*"); wattroff(h_t_p, COLOR_PAIR(1)); wprintw(h_t_p, "                                        Bomb");
-   wattron(h_t_p, COLOR_PAIR(2)); mvwprintw(h_t_p, 32, 50, "\u2022"); wattroff(h_t_p, COLOR_PAIR(2)); wprintw(h_t_p, "                                        Coin (x10)");
-   wattron(h_t_p, COLOR_PAIR(3)); mvwprintw(h_t_p, 33, 50, "\u2022"); wattroff(h_t_p, COLOR_PAIR(3)); wprintw(h_t_p, "                                        Coin (x50)");
-   wattron(h_t_p, COLOR_PAIR(2)); mvwprintw(h_t_p, 34, 50, "\u2588\u2588"); wattroff(h_t_p, COLOR_PAIR(2)); wprintw(h_t_p, "                                       Exit");
+   wattron(h_t_p, COLOR_PAIR(1)); mvwprintw(h_t_p, 30, 50, "*"); wattroff(h_t_p, COLOR_PAIR(1)); wprintw(h_t_p, "                                        Bomb");
+   wattron(h_t_p, COLOR_PAIR(2)); mvwprintw(h_t_p, 31, 50, "\u2022"); wattroff(h_t_p, COLOR_PAIR(2)); wprintw(h_t_p, "                                        Coin (x10)");
+   wattron(h_t_p, COLOR_PAIR(3)); mvwprintw(h_t_p, 32, 50, "\u2022"); wattroff(h_t_p, COLOR_PAIR(3)); wprintw(h_t_p, "                                        Coin (x50)");
+   wattron(h_t_p, COLOR_PAIR(2)); mvwprintw(h_t_p, 33, 50, "\u2588\u2588"); wattroff(h_t_p, COLOR_PAIR(2)); wprintw(h_t_p, "                                       Exit");
 
    wrefresh(h_t_p);
    getch();
@@ -120,11 +118,11 @@ void main_menu(){
    wrefresh(menu_win);
 
    keypad(menu_win, true); //Allows to use arrows in order to select options from menu
-   char MENU_OPTIONS[5][13] = {"New Game", "Hall of Fame", "How to play", "Credits", "Quit Game"};
+   char MENU_OPTIONS[4][13] = {"New Game", "How to play", "Credits", "Quit Game"};
    int highlight = 0, choice;
 
    while(1){ //main menu 
-      for (int i=0; i<5; i++){
+      for (int i=0; i<4; i++){
          if(i==highlight){
             wattron(menu_win, A_REVERSE);
          }
@@ -160,15 +158,12 @@ void main_menu(){
         game(menu_win);
         break;
     case 1:
-        hall_of_fame();
-        break;
-    case 2:
         how_to_play();
         break;
-    case 3:
+    case 2:
         credits();
         break;
-    case 4:
+    case 3:
         quit_game();
     
     default:
