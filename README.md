@@ -7,8 +7,8 @@ Whole project is written in C and based on ncurses library. If you want to compi
 
 <!-- Code Blocks -->
 ```
-    libncurses5-dev libncursesw5-dev    (ncurses)
-    sudo apt install build-essential    (gcc)
+    sudo apt install libncurses5-dev libncursesw5-dev    (ncurses)
+    sudo apt install build-essential                     (gcc)
 ```
 
 Most of modern Linux terminals should be able to display this game just fine.

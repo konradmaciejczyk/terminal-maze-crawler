@@ -1,8 +1,10 @@
 game: main.c map_elements.c
-	clear && gcc *.c -o game -lncursesw
+	rm -fr build/ && mkdir build
+	clear && gcc *.c -o build/game -lncursesw
 clean:
-	rm game
+	rm build/game
 debug:
-	clear && gcc *.c -lncursesw && gdb game
+	rm -fr build/ && mkdir build
+	clear && gcc *.c -o build/game -lncursesw && gdb build/game
 run:
-	clear && ./game
+	clear && ./build/game

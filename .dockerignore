@@ -1,0 +1,7 @@
+/screenshots
+/build
+Dockerfile
+Dockerfile.save
+Makefile
+README.md
+.dockerignore
