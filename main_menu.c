@@ -6,11 +6,19 @@ Here I set terminal for optimal size (150, 50)*/
 #include <menu.h>
 #include <locale.h>
 #include <wchar.h>
+#include <unistd.h>
 
 void main_menu(); extern void game(); extern void quit_game();
 
+//function for sleeping thread for given miliseconds
+int msleep(unsigned int tms){
+	return usleep(tms * 1000);
+}
+
 void set_game_enviroment(){
    system("printf '\e[8;50;150t'"); //Setting user terminal to 150x50
+   msleep(100);	//Sleeping thread for terminal enlarge
+   
    setlocale(LC_ALL, "");
    initscr(); //Initialize ncurses screen
 
